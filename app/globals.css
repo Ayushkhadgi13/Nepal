@@ -1,26 +1,94 @@
+/* 1. External font imports must sit on the absolute first lines of the stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Noto+Serif+Devanagari:wght@100..900&display=swap');
+
+/* 2. Framework Tailwind imports */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* 3. Global color system and styling overrides */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper-bg: #F2E6C9;       /* Light, warm Lokta background */
+    --paper-surface: #E7D7B5;  /* Richer warm paper for cards & layers */
+    --primary-ink: #2A1D13;    /* Near-black charcoal ink for ultra-high contrast */
+    --secondary-ink: #5B4534;  /* Muted dark brown for secondary typography */
+    --temple-brown: #6A4A32;
+    --old-gold: #B38A3A;
+    --forest-green: #556B4D;
+    --himalayan-blue: #647A91;
+    --muted-clay: #8C5442;
+  }
+
+  body {
+    background-color: var(--paper-bg);
+    color: var(--primary-ink);
+    font-family: 'EB Garamond', Georgia, serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--primary-ink);
+    font-weight: 500;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Hyper-realistic procedural Lokta paper shader overlay */
+.lokta-paper-main {
+  background-color: #f2e6c9;
+  background-image: 
+    /* Soft overhead daylight lighting gradient */
+    radial-gradient(circle at 50% 15%, rgba(255, 253, 245, 0.45) 0%, rgba(42, 29, 19, 0.08) 100%),
+    /* Micro fiber texture overlay */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperFibers'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperFibers)'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 80px rgba(42, 29, 19, 0.08);
+}
+
+/* High-contrast ink dispersion SVG filter layer */
+.ink-bleed {
+  filter: url('#inkBleedFilter');
+}
+
+/* Handcrafted leather bookmark navigation panel */
+.bookmark-strip {
+  background-color: var(--temple-brown);
+  color: var(--paper-bg);
+  border-left: 2px solid var(--old-gold);
+  border-right: 2px solid var(--old-gold);
+  box-shadow: 0 8px 20px rgba(42, 29, 19, 0.25);
+}
+
+/* Red ink woodblock stamp button style */
+.stamp-button {
+  border: 1.5px solid var(--muted-clay);
+  color: var(--muted-clay);
+  background: transparent;
+  font-family: 'EB Garamond', serif;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.stamp-button:hover {
+  background-color: rgba(140, 84, 66, 0.06);
+  border-color: var(--primary-ink);
+  color: var(--primary-ink);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 10px rgba(42, 29, 19, 0.08);
+}
+
+.stamp-button:active {
+  transform: translateY(1.5px);
+  box-shadow: none;
+}
+
+/* Custom ink-toned scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-ink);
+  border: 2px solid var(--paper-surface);
+  border-radius: 6px;
 }
