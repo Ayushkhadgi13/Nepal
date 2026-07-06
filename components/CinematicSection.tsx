@@ -1,6 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface CinematicSectionProps {
   id: string;
@@ -21,13 +26,45 @@ export default function CinematicSection({
   accent,
   imageBg,
 }: CinematicSectionProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    // Viewport-driven entrance animation lifecycle managed entirely via ScrollTrigger
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        end: 'bottom 15%',
+        toggleActions: 'play none none none',
+        once: true,
+      },
+    });
+
+    tl.fromTo(
+      contentRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' }
+    ).fromTo(
+      cardRef.current,
+      { opacity: 0, y: 40, scale: 0.98 },
+      { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power2.out' },
+      '-=0.7'
+    );
+  }, { scope: sectionRef });
+
   return (
     <section
       id={id}
+      ref={sectionRef}
       className="min-h-screen w-full flex items-center justify-center py-24 px-6 md:px-12 relative overflow-hidden border-t border-[#2A1D13]/10 bg-[#E7D7B5]/15"
     >
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-        <div className="flex flex-col justify-center">
+        <div ref={contentRef} style={{ opacity: 0 }} className="flex flex-col justify-center">
           <span className={`text-[10px] uppercase tracking-[0.4em] font-bold ${accent}`}>{tagline}</span>
           <h3 className="text-3xl md:text-5xl font-serif font-normal text-[#2A1D13] tracking-wide mt-3 mb-6 uppercase leading-tight">
             {title}
@@ -44,11 +81,9 @@ export default function CinematicSection({
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+        <div
+          ref={cardRef}
+          style={{ opacity: 0 }}
           className="relative h-[280px] md:h-[450px] rounded-2xl overflow-hidden group border border-[#2A1D13]/15 bg-[#E7D7B5]/40 shadow-sm"
         >
           <div className={`absolute inset-0 bg-gradient-to-br ${imageBg} opacity-15`} />
@@ -63,7 +98,7 @@ export default function CinematicSection({
             <span className="text-[9px] uppercase tracking-[0.15em] text-[#2A1D13]/50 font-serif">Plate IV</span>
             <span className="text-[9px] uppercase tracking-[0.15em] text-[#8C5442] font-mono font-bold">LOKTA CHRONICLE</span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

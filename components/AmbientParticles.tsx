@@ -26,6 +26,7 @@ export default function AmbientParticles() {
     let animationFrameId: number;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
+    let isLoopActive = true;
 
     const dustList: DustParticle[] = [];
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,12 +51,13 @@ export default function AmbientParticles() {
     createDust();
 
     const draw = () => {
+      if (!isLoopActive) return;
+      
       ctx.clearRect(0, 0, width, height);
 
       dustList.forEach((d) => {
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-        // Soft carbon-ink colored particles simulating floating fibers in daylight
         ctx.fillStyle = `rgba(42, 29, 19, ${d.opacity})`;
         ctx.fill();
 
@@ -78,6 +80,19 @@ export default function AmbientParticles() {
 
     draw();
 
+    // Pause rendering entirely when the tab is out of focus (battery-saving)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isLoopActive = false;
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        if (!isLoopActive) {
+          isLoopActive = true;
+          draw();
+        }
+      }
+    };
+
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
@@ -85,17 +100,19 @@ export default function AmbientParticles() {
     };
 
     window.addEventListener('resize', handleResize, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-20 opacity-60"
+      className="pointer-events-none fixed inset-0 z-20 opacity-60"
       aria-hidden="true"
     />
   );
