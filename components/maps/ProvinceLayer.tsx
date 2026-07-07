@@ -33,10 +33,10 @@ export default function ProvinceLayer({
             ref={(el) => {
               pathRefs.current[index] = el;
             }}
-            d={prov.path}
+            d={prov.path ?? ''}
             tabIndex={0}
             role="button"
-            aria-label={`${prov.name}. Archive ledger coordinates.`}
+            aria-label={`${prov.name ?? prov.nameEn}. Archive ledger coordinates.`}
             className={`transition-all duration-300 cursor-pointer outline-none ${
               isActive
                 ? 'stroke-[#2A1D13] fill-[#2A1D13]/8 stroke-[2.2]'
@@ -45,7 +45,7 @@ export default function ProvinceLayer({
                 : 'stroke-[#2A1D13]/30 fill-transparent stroke-[1.1] hover:fill-[#2A1D13]/1'
             }`}
             style={{
-              transformOrigin: `${prov.cx}px ${prov.cy}px`,
+              transformOrigin: `${prov.cx ?? 0}px ${prov.cy ?? 0}px`,
               transform: isHovered || isActive ? 'translateY(-2px) scale(1.005)' : 'none',
               filter: isHovered || isActive ? 'drop-shadow(0 4px 6px rgba(42, 29, 19, 0.08))' : 'none',
             }}

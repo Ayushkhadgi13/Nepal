@@ -12,7 +12,6 @@ export default function SmoothScroll({ children, active }: SmoothScrollProps) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // If lenis should be disabled (stages 0, 1, 2), destroy instance and exit
     if (!active) {
       if (lenisRef.current) {
         lenisRef.current.destroy();
@@ -22,7 +21,7 @@ export default function SmoothScroll({ children, active }: SmoothScrollProps) {
     }
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.4,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
@@ -39,9 +38,6 @@ export default function SmoothScroll({ children, active }: SmoothScrollProps) {
     }
 
     requestAnimationFrame(raf);
-
-    // Force top position immediately on activation
-    lenis.scrollTo(0, { immediate: true });
 
     return () => {
       lenis.destroy();

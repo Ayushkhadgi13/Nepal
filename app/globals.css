@@ -7,15 +7,23 @@
 /* 3. Global color system and styling overrides */
 @layer base {
   :root {
-    --paper-bg: #F2E6C9;       /* Light, warm Lokta background */
-    --paper-surface: #E7D7B5;  /* Richer warm paper for cards & layers */
-    --primary-ink: #2A1D13;    /* Near-black charcoal ink for ultra-high contrast */
-    --secondary-ink: #5B4534;  /* Muted dark brown for secondary typography */
-    --temple-brown: #6A4A32;
-    --old-gold: #B38A3A;
-    --forest-green: #556B4D;
-    --himalayan-blue: #647A91;
-    --muted-clay: #8C5442;
+    /* Dynamic parameters driven by altitude (GSAP ScrollTrigger) */
+    --paper-bg: #F3EAD3;            /* Authentic warm golden Daphne/Lokta bark */
+    --paper-surface: #E7D7B5;
+    --primary-ink: #2C1E14;         /* Traditional soot/charcoal ink */
+    --secondary-ink: #5E4633;
+    
+    /* Responsive desk & museum lighting properties */
+    --vignette-color: rgba(43, 29, 17, 0.22); /* Deep bone-brown peripheral desk shadows */
+    --vignette-intensity: 100%;
+    --spotlight-color: rgba(224, 186, 114, 0.12); /* Interactive warm desk-lamp glow */
+    --spotlight-radius: 600px;
+    
+    /* Tactile material details */
+    --fiber-opacity: 0.14;
+    --stain-opacity: 0.04;
+    --frost-opacity: 0.0;           /* Only appears near high altitude passes */
+    --frost-color: rgba(235, 243, 246, 0.0);
   }
 
   body {
@@ -23,24 +31,81 @@
     color: var(--primary-ink);
     font-family: 'EB Garamond', Georgia, serif;
     overflow-x: hidden;
+    transition: background-color 1s cubic-bezier(0.22, 1, 0.36, 1), color 1s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--primary-ink);
     font-weight: 500;
+    transition: color 1s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
-/* Hyper-realistic procedural Lokta paper shader overlay */
+/* Redesigned Multi-Layered Daphne/Lokta Paper Environment */
 .lokta-paper-main {
-  background-color: #f2e6c9;
+  position: relative;
+  background-color: var(--paper-bg);
+  
   background-image: 
-    /* Soft overhead daylight lighting gradient */
-    radial-gradient(circle at 50% 15%, rgba(255, 253, 245, 0.45) 0%, rgba(42, 29, 19, 0.08) 100%),
-    /* Micro fiber texture overlay */
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperFibers'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperFibers)'/%3E%3C/svg%3E");
-  box-shadow: inset 0 0 80px rgba(42, 29, 19, 0.08);
+    /* 1. Dynamic Cursor Lighting Overlay (Simulates material normal response to desk light source) */
+    radial-gradient(circle var(--spotlight-radius) at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--spotlight-color) 0%, transparent 100%),
+    
+    /* 2. Natural Explorer's Desk Vignette (Clamps page edges to feel physically resting on desk surface) */
+    radial-gradient(circle at 50% 50%, transparent 40%, var(--vignette-color) var(--vignette-intensity)),
+    
+    /* 3. Archival Page Imperfections: Rare ink stains, testing test-strokes and workspace wear */
+    radial-gradient(ellipse at 80% 12%, rgba(94, 70, 51, var(--stain-opacity)) 0%, transparent 22%),
+    radial-gradient(circle at 15% 72%, rgba(13, 9, 5, calc(var(--stain-opacity) * 0.7)) 0%, transparent 12%),
+    
+    /* 4. High-Altitude Frost Crystal Intrusion (Gradually covers paper edges during cold ascents) */
+    radial-gradient(circle at top, var(--frost-color) 0%, transparent 100%),
+    
+    /* 5. Procedural Daphne Bark Fibers & Organic Strands Grid Overlay */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3Cpath d='M30 40 C 90 43, 140 22, 220 50' stroke='rgba(42,29,19,0.12)' stroke-width='0.75' fill='none'/%3E%3Cpath d='M250 180 C 310 210, 320 140, 380 220' stroke='rgba(42,29,19,0.08)' stroke-width='0.5' fill='none'/%3E%3Cpath d='M80 290 Q 150 380, 200 310' stroke='rgba(42,29,19,0.1)' stroke-width='0.6' fill='none'/%3E%3Cpath d='M10 210 Q 50 110, 110 130' stroke='rgba(42,29,19,0.06)' stroke-width='0.55' fill='none'/%3E%3C/svg%3E");
+
+  box-shadow: inset 0 0 120px rgba(28, 18, 12, 0.08);
+  transition: background-color 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Authentic physical open-ledger book binding effect */
+.lokta-paper-main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    rgba(28, 18, 12, 0.0) 0%, 
+    rgba(28, 18, 12, 0.04) 30%, 
+    rgba(28, 18, 12, 0.15) 50%, 
+    rgba(28, 18, 12, 0.04) 70%, 
+    rgba(28, 18, 12, 0.0) 100%
+  );
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* Horizontal physical paper fold compression marks */
+.page-wear-fold {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(42, 29, 19, 0.02) 20%,
+    rgba(42, 29, 19, 0.06) 50%,
+    rgba(42, 29, 19, 0.02) 80%,
+    transparent 95%
+  );
+  box-shadow: 0 1px 1px rgba(255, 253, 245, 0.4);
+  pointer-events: none;
+  z-index: 12;
 }
 
 /* High-contrast ink dispersion SVG filter layer */
@@ -48,19 +113,10 @@
   filter: url('#inkBleedFilter');
 }
 
-/* Handcrafted leather bookmark navigation panel */
-.bookmark-strip {
-  background-color: var(--temple-brown);
-  color: var(--paper-bg);
-  border-left: 2px solid var(--old-gold);
-  border-right: 2px solid var(--old-gold);
-  box-shadow: 0 8px 20px rgba(42, 29, 19, 0.25);
-}
-
 /* Red ink woodblock stamp button style */
 .stamp-button {
-  border: 1.5px solid var(--muted-clay);
-  color: var(--muted-clay);
+  border: 1.5px solid var(--secondary-ink);
+  color: var(--secondary-ink);
   background: transparent;
   font-family: 'EB Garamond', serif;
   font-weight: 600;
@@ -68,27 +124,21 @@
 }
 
 .stamp-button:hover {
-  background-color: rgba(140, 84, 66, 0.06);
+  background-color: rgba(42, 29, 19, 0.04);
   border-color: var(--primary-ink);
   color: var(--primary-ink);
   transform: translateY(-0.5px);
-  box-shadow: 0 4px 10px rgba(42, 29, 19, 0.08);
-}
-
-.stamp-button:active {
-  transform: translateY(1.5px);
-  box-shadow: none;
 }
 
 /* Custom ink-toned scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--paper-surface);
+  background: var(--paper-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-ink);
-  border: 2px solid var(--paper-surface);
-  border-radius: 6px;
+  background: var(--secondary-ink);
+  border: 2px solid var(--paper-bg);
+  border-radius: 4px;
 }

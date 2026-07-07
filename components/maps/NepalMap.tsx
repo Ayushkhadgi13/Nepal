@@ -93,28 +93,30 @@ const NepalMap = forwardRef<NepalMapHandles, NepalMapProps>(({
       <g ref={namesRef} className="pointer-events-none select-none font-serif">
         {provinces.map((prov) => {
           const isSelected = selectedId === prov.id;
+          const cx = prov.cx ?? 0;
+          const cy = prov.cy ?? 0;
           return (
             <g key={`label-${prov.id}`} className="transition-all duration-300">
               <text
-                x={prov.cx}
-                y={prov.cy - 1}
+                x={cx}
+                y={cy - 1}
                 textAnchor="middle"
                 className={`text-[9px] uppercase tracking-wider font-bold transition-colors duration-300 ${
                   isSelected ? 'fill-[#2A1D13]' : 'fill-[#2A1D13]/40'
                 }`}
               >
-                {prov.name}
+                {prov.name ?? prov.nameEn}
               </text>
               <text
-                x={prov.cx}
-                y={prov.cy + 8}
+                x={cx}
+                y={cy + 8}
                 textAnchor="middle"
                 className={`text-[8.5px] italic transition-colors duration-300 ${
                   isSelected ? 'fill-[#8C5442]' : 'fill-[#2A1D13]/20'
                 }`}
                 style={{ fontFamily: "'Noto Serif Devanagari', serif" }}
               >
-                {prov.nepaliName}
+                {prov.nepaliName ?? prov.nameNe}
               </text>
             </g>
           );

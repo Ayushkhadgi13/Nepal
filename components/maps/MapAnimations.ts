@@ -1,121 +1,96 @@
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { MapAnimationProps } from './types';
 
-gsap.registerPlugin(ScrollTrigger);
+export class MapAnimations {
+  public static triggerInitialDraw(container: HTMLElement, onComplete?: () => void): gsap.core.Timeline {
+    const boundary = container.querySelector<SVGPathElement>('.country-outline-path, #nepal-outline');
+    const mountains = container.querySelectorAll<SVGElement>('.mountain-ridge-trace, .mountain-ridge');
+    const rivers = container.querySelectorAll<SVGPathElement>('.river-path-trace, .river-path');
+    const grids = container.querySelectorAll<SVGElement>('.tick-line-grid, .tick-line');
+    const labels = container.querySelectorAll<SVGElement>('.province-label');
 
-export function runMapAnimations({
-  containerRef,
-  svgRef,
-  pathRefs,
-  illustrationsRef,
-  namesRef,
-  compassRef,
-  dropletRef,
-  triggerDraw,
-  onComplete,
-}: MapAnimationProps) {
-  if (!triggerDraw) return;
+    const timeline = gsap.timeline({
+      defaults: { overwrite: 'auto' },
+      onComplete,
+    });
 
-  // Ensure initial starting conditions
-  gsap.set([illustrationsRef.current, namesRef.current], { opacity: 0 });
-  gsap.set(dropletRef.current, { scale: 0, opacity: 0 });
-
-  const totalTimeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: containerRef.current,
-      start: 'top 85%',
-      once: true,
-    },
-    onComplete: () => {
-      if (onComplete) onComplete();
-    },
-  });
-
-  // Step A: Ink Droplet splash
-  totalTimeline.to(dropletRef.current, {
-    scale: 1,
-    opacity: 0.9,
-    duration: 0.35,
-    ease: 'bounce.out',
-  });
-  totalTimeline.to(dropletRef.current, {
-    scale: 4,
-    opacity: 0,
-    duration: 0.55,
-    ease: 'power2.out',
-  }, '-=0.1');
-
-  // Step B: Sequential Drawing of boundaries
-  pathRefs.current.forEach((path, index) => {
-    if (!path) return;
-    const length = path.getTotalLength();
-    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
-
-    totalTimeline.to(path, {
-      strokeDashoffset: 0,
-      opacity: 1,
-      duration: 1.0 + Math.random() * 0.4,
-      ease: 'power1.inOut',
-    }, index === 0 ? '-=0.2' : '-=0.9');
-  });
-
-  // Step C: Illustrations fade-in
-  totalTimeline.fromTo(
-    illustrationsRef.current,
-    { opacity: 0 },
-    { opacity: 0.75, duration: 1.1, ease: 'power2.out' },
-    '-=0.4'
-  );
-
-  // Step D: Typography Printed label fade-in
-  totalTimeline.fromTo(
-    namesRef.current,
-    { opacity: 0, y: 4 },
-    { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' },
-    '-=0.5'
-  );
-
-  // Step E: Set up constant idle compass breathing animation loop
-  const compassNeedle = compassRef.current?.querySelector('#needleGroup');
-  if (compassNeedle) {
-    gsap.fromTo(
-      compassNeedle,
-      { rotation: -4 },
-      {
-        rotation: 4,
-        duration: 5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        transformOrigin: '40px 40px',
-      }
+    timeline.fromTo(
+      grids,
+      { opacity: 0 },
+      { opacity: 0.6, duration: 1.2, ease: 'power1.out' }
     );
+
+    if (boundary) {
+      const length = getPathLength(boundary);
+      gsap.set(boundary, { strokeDasharray: length, strokeDashoffset: length, opacity: 0 });
+      timeline.to(
+        boundary,
+        {
+          strokeDashoffset: 0,
+          opacity: 0.85,
+          duration: 2.8,
+          ease: 'power2.inOut',
+        },
+        '-=0.6'
+      );
+    }
+
+    timeline.fromTo(
+      mountains,
+      { opacity: 0, y: 15 },
+      { opacity: 0.55, y: 0, stagger: 0.02, duration: 1.5, ease: 'power2.out' },
+      '-=1.5'
+    );
+
+    rivers.forEach((river) => {
+      const length = getPathLength(river);
+      gsap.set(river, { strokeDasharray: length, strokeDashoffset: length });
+    });
+
+    timeline.fromTo(
+      rivers,
+      { opacity: 0 },
+      { strokeDashoffset: 0, opacity: 0.35, stagger: 0.15, duration: 2, ease: 'sine.inOut' },
+      '-=1.2'
+    );
+
+    timeline.fromTo(
+      labels,
+      { opacity: 0, filter: 'blur(3px)' },
+      { opacity: 0.85, filter: 'blur(0px)', stagger: 0.08, duration: 0.8, ease: 'power1.out' },
+      '-=1'
+    );
+
+    return timeline;
   }
 
-  // Step F: Subtle structural floating sway to give physical paper weight
-  const floatingTween = gsap.to(svgRef.current, {
-    y: '+=2.0',
-    x: '+=1.0',
-    rotation: 0.4,
-    transformOrigin: '50% 50%',
-    duration: 9.0,
-    repeat: -1,
-    yoyo: true,
-    ease: 'sine.inOut',
-  });
+  public static animateActiveState(path: SVGPathElement, isActive: boolean): void {
+    path.classList.toggle('is-selected', isActive);
+    path.classList.remove('is-hovered');
 
-  // Pause floating sway when completely off viewport boundaries
-  ScrollTrigger.create({
-    trigger: containerRef.current,
-    start: 'top bottom',
-    end: 'bottom top',
-    onToggle: (self) => {
-      if (self.isActive) {
-        floatingTween.play();
-      } else {
-        floatingTween.pause();
-      }
-    },
-  });
+    gsap.to(path, {
+      fill: isActive ? 'rgba(140, 84, 66, 0.12)' : 'transparent',
+      stroke: isActive ? '#8C5442' : 'rgba(42, 29, 19, 0.35)',
+      strokeWidth: isActive ? 2.2 : 1.5,
+      duration: isActive ? 0.5 : 0.6,
+      ease: isActive ? 'power1.out' : 'power1.inOut',
+      overwrite: 'auto',
+    });
+  }
+
+  public static animateHoverState(path: SVGPathElement, isHovered: boolean): void {
+    path.classList.toggle('is-hovered', isHovered);
+
+    gsap.to(path, {
+      fill: isHovered ? 'rgba(42, 29, 19, 0.06)' : 'transparent',
+      stroke: isHovered ? '#2A1D13' : 'rgba(42, 29, 19, 0.35)',
+      strokeWidth: isHovered ? 1.8 : 1.5,
+      duration: 0.25,
+      ease: 'power1.out',
+      overwrite: 'auto',
+    });
+  }
+}
+
+function getPathLength(path: SVGPathElement | null): number {
+  return path && typeof path.getTotalLength === 'function' ? path.getTotalLength() : 4500;
 }

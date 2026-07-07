@@ -1,30 +1,31 @@
 export interface ProvinceData {
-  id: string;
-  name: string;
-  nepaliName: string;
+  id: ProvinceId;
+  nameEn: string;
+  nameNe: string;
   elevation: string;
-  area: string;
-  highestPeak: string;
-  majorCities: string;
-  nationalParks: string;
-  unescoSites: string;
-  festivals: string;
-  poeticDescription: string;
-  archiveNo: string;
-  sketchLabel: string;
-  path: string;
-  cx: number; // Center X for label alignment
-  cy: number; // Center Y for label alignment
+  terrain: string;
+  description: string;
+  highlights: string[];
+  name?: string;
+  nepaliName?: string;
+  path?: string;
+  cx?: number;
+  cy?: number;
 }
 
-export interface MapAnimationProps {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  svgRef: React.RefObject<SVGSVGElement | null>;
-  pathRefs: React.MutableRefObject<(SVGPathElement | null)[]>;
-  illustrationsRef: React.RefObject<SVGGElement | null>;
-  namesRef: React.RefObject<SVGGElement | null>;
-  compassRef: React.RefObject<SVGGElement | null>;
-  dropletRef: React.RefObject<SVGCircleElement | null>;
-  triggerDraw: boolean;
-  onComplete?: () => void;
+export type ProvinceId =
+  | 'koshi'
+  | 'madhesh'
+  | 'bagmati'
+  | 'gandaki'
+  | 'lumbini'
+  | 'karnali'
+  | 'sudurpashchim';
+
+export type ProvinceMap = Record<ProvinceId, ProvinceData>;
+
+export interface SvgMapHandle {
+  container: HTMLElement;
+  svg: SVGSVGElement;
+  provinces: Map<ProvinceId, SVGPathElement>;
 }
